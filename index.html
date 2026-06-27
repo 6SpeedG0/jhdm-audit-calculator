@@ -1078,8 +1078,8 @@ src="https://www.facebook.com/tr?id=1695124645149797&ev=PageView&noscript=1"/></
   const EMAILJS_SERVICE_ID  = 'service_3gtd9y8';
   const EMAILJS_TEMPLATE_ID = 'template_gf0962r';
 
-  // n8n webhook — create a Webhook node in n8n with path "jhdm-leads" (POST, no auth)
-  const N8N_WEBHOOK_URL = 'https://n8n.srv912849.hstgr.cloud/webhook/jhdm-leads';
+  const SUPABASE_URL      = 'https://bjqogskkerirjrmdmxyu.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqcW9nc2trZXJpcmpybWRteHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NzU2MDYsImV4cCI6MjA5ODE1MTYwNn0.vvFo0Ux97LV697NJ10Or6nxoUSMY8Sxzrh9_O-wfg9A';
   // EmailJS template should use these variables:
   //   {{to_name}}       — recipient first name
   //   {{to_email}}      — recipient email
@@ -1340,10 +1340,15 @@ src="https://www.facebook.com/tr?id=1695124645149797&ev=PageView&noscript=1"/></
       status.textContent = `✓ Results sent to ${email} — check your inbox!`;
       btnTxt.textContent = 'Sent ✓';
 
-      // Log lead to Supabase via n8n
-      fetch(N8N_WEBHOOK_URL, {
+      // Log lead directly to Supabase
+      fetch(`${SUPABASE_URL}/rest/v1/calculator_leads`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Prefer': 'return=minimal'
+        },
         body: JSON.stringify({
           name,
           email,
