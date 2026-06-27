@@ -745,6 +745,9 @@ src="https://www.facebook.com/tr?id=1695124645149797&ev=PageView&noscript=1"/></
     <div class="modal-eyebrow">Your free results report</div>
     <div class="modal-title">Send my audit results</div>
     <p class="modal-sub">We'll email you a full copy of your results — no follow-up unless you reach out first.</p>
+    <div style="display:none" aria-hidden="true">
+      <input type="text" id="hp_website" name="website" tabindex="-1" autocomplete="off">
+    </div>
     <div class="modal-field">
       <label class="modal-label" for="emailName">Your first name</label>
       <input class="modal-input" id="emailName" type="text" placeholder="e.g. James" autocomplete="given-name">
@@ -1281,6 +1284,8 @@ src="https://www.facebook.com/tr?id=1695124645149797&ev=PageView&noscript=1"/></
 
   // ── SEND RESULTS ──
   async function sendResults() {
+    if (document.getElementById('hp_website').value !== '') return; // bot trap
+
     const name  = document.getElementById('emailName').value.trim();
     const email = document.getElementById('emailAddress').value.trim();
     const status = document.getElementById('modalStatus');
