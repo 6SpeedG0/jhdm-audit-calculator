@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Automation Savings Calculator | James Harvey Digital Marketing</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='18' font-family='serif' fill='%23c9a84c'%3EJ%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  :root {
+    --black: #0a0a0a;
+    --deep: #111318;
+    --surface: #181c24;
+    --card: #1e2330;
+    --border: #2a3040;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dim: rgba(201,168,76,0.15);
+    --red: #e05c4a;
+    --green: #4aad7a;
+    --text: #e8e4dc;
+    --muted: #8a8f9e;
+    --subtle: #3a4055;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 20% -10%, rgba(201,168,76,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 110%, rgba(201,168,76,0.04) 0%, transparent 60%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,10,0.8);
+    backdrop-filter: blur(10px);
+  }
+  .logo { display: flex; flex-direction: column; gap: 1px; }
+  .logo-main { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: 0.02em; }
+  .header-badge { display: flex; align-items: center; gap: 8px; font-size: 14.4px; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.05em; }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* ── HERO ── */
+  .hero { position: relative; z-index: 5; text-align: center; padding: 80px 40px 60px; max-width: 800px; margin: 0 auto; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'DM Mono', monospace; font-size: 14.85px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 28px; padding: 10.8px 21.6px;
+    border: 1px solid var(--gold-dim); border-radius: 2px; background: var(--gold-dim);
+    box-shadow: 0 0 12px 3px rgba(201,168,76,0.35), 0 0 28px 6px rgba(201,168,76,0.15);
+  }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(36px, 6vw, 68px); font-weight: 900; line-height: 1.05; margin-bottom: 24px; color: var(--text); }
+  .hero h1 em { font-style: italic; color: var(--gold); }
+  .hero-sub { font-size: 17px; color: var(--muted); line-height: 1.7; max-width: 540px; margin: 0 auto 40px; font-weight: 300; }
+  .hero-meta { display: flex; align-items: center; justify-content: center; gap: 32px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+  .hero-meta span { display: flex; align-items: center; gap: 6px; }
+  .hero-meta span::before { content: '✓'; color: var(--green); }
+  .scroll-hint { margin-top: 50px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; letter-spacing: 0.1em; animation: bounce 2s infinite; }
+  @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+  /* ── CALCULATOR SHELL ── */
+  .calc-container { position: relative; z-index: 5; max-width: 760px; margin: 0 auto 120px; padding: 0 24px; }
+
+  /* Progress */
+  .progress-track { display: flex; gap: 6px; margin-bottom: 32px; padding: 0 4px; }
+  .progress-seg { flex: 1; height: 3px; background: var(--subtle); border-radius: 2px; transition: background 0.4s ease; }
+  .progress-seg.active { background: var(--gold); }
+  .progress-seg.done { background: var(--gold); opacity: 0.5; }
+  .step-label { display: flex; justify-content: space-between; margin-bottom: 48px; }
+  .step-label-text { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
+  .step-counter { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--gold); }
+
+  /* Steps */
+  .step { display: none; animation: stepIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+  .step.active { display: block; }
+  @keyframes stepIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+  .step-question { font-family: 'Playfair Display', serif; font-size: clamp(24px, 4vw, 36px); font-weight: 700; line-height: 1.2; margin-bottom: 12px; color: var(--text); }
+  .step-hint { font-size: 14px; color: var(--muted); margin-bottom: 40px; line-height: 1.6; font-weight: 300; }
+
+  /* Option cards */
+  .options-grid { display: grid; gap: 10px; }
+  .options-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .option-card {
+    background: var(--card); border: 1.5px solid var(--border); border-radius: 6px;
+    padding: 18px 22px; cursor: pointer; transition: all 0.2s ease;
+    display: flex; align-items: flex-start; gap: 14px; position: relative; overflow: hidden;
+  }
+  .option-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--gold); transform: scaleY(0); transition: transform 0.2s ease; transform-origin: bottom;
+  }
+  .option-card:hover { border-color: var(--gold); background: rgba(201,168,76,0.05); }
+  .option-card:hover::before { transform: scaleY(1); }
+  .option-card.selected { border-color: var(--gold); background: var(--gold-dim); }
+  .option-card.selected::before { transform: scaleY(1); }
+  .option-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .option-text { flex: 1; }
+  .option-label { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .option-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .option-check {
+    width: 20px; height: 20px; border: 1.5px solid var(--border); border-radius: 50%;
+    flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; font-size: 11px;
+  }
+  .option-card.selected .option-check { background: var(--gold); border-color: var(--gold); color: #000; }
+  .multi-hint { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--gold); margin-bottom: 20px; text-transform: uppercase; }
+
+  /* Slider — FIX: properly size number vs decorator spans; add Firefox thumb */
+  .slider-wrap { margin-bottom: 12px; }
+  .slider-display { font-family: 'Playfair Display', serif; font-weight: 700; color: var(--gold); margin-bottom: 16px; text-align: center; line-height: 1; }
+  .slider-display .deco { font-size: 24px; color: var(--muted); }
+  .slider-display .num  { font-size: 56px; }
+  input[type=range] { width: 100%; -webkit-appearance: none; appearance: none; height: 3px; background: var(--subtle); border-radius: 2px; outline: none; cursor: pointer; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); border: 3px solid var(--black); box-shadow: 0 0 0 2px var(--gold); cursor: pointer; transition: transform 0.15s; }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  /* FIX: Firefox thumb */
+  input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: var(--gold); border: 3px solid var(--black); box-shadow: 0 0 0 2px var(--gold); cursor: pointer; transition: transform 0.15s; }
+  input[type=range]::-moz-range-track { height: 3px; background: var(--subtle); border-radius: 2px; }
+  .slider-labels { display: flex; justify-content: space-between; margin-top: 10px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  /* Nav buttons */
+  .step-nav { display: flex; gap: 12px; margin-top: 44px; align-items: center; }
+  .btn-back { padding: 14px 24px; background: transparent; border: 1.5px solid var(--border); border-radius: 4px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; letter-spacing: 0.02em; }
+  .btn-back:hover { border-color: var(--muted); color: var(--text); }
+  .btn-next { flex: 1; padding: 16px 32px; background: var(--gold); border: none; border-radius: 4px; color: #000; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; letter-spacing: 0.03em; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-next:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
+  .btn-next:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* Tally bar — FIX: use display:none not just opacity so it takes no space when hidden */
+  .tally-bar { position: sticky; top: 0; z-index: 20; background: rgba(14,16,22,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 14px 40px; display: flex; align-items: center; justify-content: space-between; transition: opacity 0.3s; }
+  .tally-bar.hidden { display: none; }
+  .tally-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
+  .tally-amount { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--red); transition: all 0.4s; }
+  .tally-per { font-size: 13px; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+
+  /* ── RESULTS ── */
+  #results { display: none; animation: stepIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); position: relative; z-index: 5; max-width: 800px; margin: 0 auto; padding: 0 24px 120px; }
+  .results-header { text-align: center; padding: 60px 0 50px; }
+  .results-eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.25em; color: var(--gold); text-transform: uppercase; margin-bottom: 20px; }
+  .results-headline { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 54px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+  .results-headline .cost-reveal { color: var(--red); display: block; }
+  .results-sub { font-size: 16px; color: var(--muted); font-weight: 300; max-width: 500px; margin: 0 auto; line-height: 1.7; }
+
+  /* Metrics grid */
+  .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .metric-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 28px; position: relative; overflow: hidden; }
+  .metric-card.featured { grid-column: span 2; background: linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(201,168,76,0.04) 100%); border-color: rgba(201,168,76,0.4); }
+  .metric-card::after { content: ''; position: absolute; top: 0; right: 0; width: 80px; height: 80px; background: radial-gradient(circle at top right, rgba(201,168,76,0.06), transparent); }
+  .metric-tag { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .metric-value { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 900; color: var(--red); line-height: 1; margin-bottom: 6px; }
+  .metric-card.featured .metric-value { font-size: 58px; }
+  .metric-value.green { color: var(--green); }
+  .metric-sub { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  /* Breakdown */
+  .breakdown-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 32px; margin-bottom: 14px; }
+  .breakdown-title { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 24px; }
+  .breakdown-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); gap: 16px; }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-left { display: flex; align-items: center; gap: 14px; }
+  .breakdown-icon { width: 36px; height: 36px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .breakdown-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .breakdown-desc { font-size: 12px; color: var(--muted); }
+  .breakdown-amount { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 500; color: var(--red); white-space: nowrap; }
+
+  /* Opportunity */
+  .opportunity-card { background: linear-gradient(135deg, rgba(74,173,122,0.1) 0%, rgba(74,173,122,0.04) 100%); border: 1px solid rgba(74,173,122,0.3); border-radius: 8px; padding: 32px; margin-bottom: 14px; }
+  .opp-title { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--green); margin-bottom: 20px; }
+  .opp-comparison { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-bottom: 24px; }
+  .opp-side { padding: 20px; border-radius: 6px; text-align: center; }
+  .opp-side.bad { background: rgba(224,92,74,0.1); border: 1px solid rgba(224,92,74,0.2); }
+  .opp-side.good { background: rgba(74,173,122,0.1); border: 1px solid rgba(74,173,122,0.2); }
+  .opp-label { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 8px; font-family: 'DM Mono', monospace; text-transform: uppercase; }
+  .opp-val { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; line-height: 1; }
+  .opp-val.red { color: var(--red); }
+  .opp-val.green { color: var(--green); }
+  .opp-arrow { font-size: 24px; color: var(--muted); text-align: center; }
+  .roi-timeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .roi-point { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px; text-align: center; }
+  .roi-year { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
+  .roi-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--green); }
+
+  /* Recommendation */
+  .recommendation-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 36px; margin-bottom: 14px; }
+  .rec-tag { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+  .rec-headline { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; margin-bottom: 14px; line-height: 1.2; }
+  .rec-body { font-size: 15px; color: var(--muted); line-height: 1.8; margin-bottom: 24px; font-weight: 300; }
+  .rec-items { display: grid; gap: 10px; }
+  .rec-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; }
+  .rec-item-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); margin-top: 1px; flex-shrink: 0; }
+  .rec-item-text { font-size: 14px; color: var(--text); line-height: 1.5; }
+  .rec-item-text strong { color: var(--text); font-weight: 600; }
+  .rec-item-text span { color: var(--muted); font-size: 13px; }
+
+  /* CTA */
+  .cta-card { background: var(--gold); border-radius: 8px; padding: 48px; text-align: center; position: relative; overflow: hidden; }
+  .cta-card::before { content: ''; position: absolute; top: -40px; right: -40px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,0.08); }
+  .cta-card::after { content: ''; position: absolute; bottom: -60px; left: -30px; width: 160px; height: 160px; border-radius: 50%; background: rgba(0,0,0,0.06); }
+  .cta-eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(0,0,0,0.5); margin-bottom: 16px; }
+  .cta-headline { font-family: 'Playfair Display', serif; font-size: clamp(26px, 4vw, 38px); font-weight: 900; color: #000; margin-bottom: 12px; line-height: 1.15; position: relative; z-index: 1; }
+  .cta-sub { font-size: 15px; color: rgba(0,0,0,0.6); margin-bottom: 36px; font-weight: 300; line-height: 1.6; max-width: 440px; margin-left: auto; margin-right: auto; position: relative; z-index: 1; }
+  .cta-btn { display: inline-flex; align-items: center; gap: 10px; padding: 18px 40px; background: #000; color: var(--gold); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.04em; border: none; border-radius: 4px; cursor: pointer; transition: all 0.2s; text-decoration: none; position: relative; z-index: 1; }
+  .cta-btn:hover { background: #111; transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0,0,0,0.4); }
+  .cta-guarantees { display: flex; align-items: center; justify-content: center; gap: 24px; margin-top: 24px; position: relative; z-index: 1; }
+  .cta-guarantee { display: flex; align-items: center; gap: 6px; font-size: 12px; color: rgba(0,0,0,0.5); font-family: 'DM Mono', monospace; letter-spacing: 0.05em; text-transform: uppercase; }
+  .btn-reset { display: block; margin: 32px auto 0; background: none; border: none; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.1em; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .btn-reset:hover { color: var(--text); }
+
+  /* ── EMAIL MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(6px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 40px;
+    max-width: 480px;
+    width: 100%;
+    position: relative;
+    animation: stepIn 0.3s cubic-bezier(0.16,1,0.3,1);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.1);
+  }
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: none; border: none;
+    color: var(--muted); font-size: 20px;
+    cursor: pointer; line-height: 1;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; transition: all 0.2s;
+  }
+  .modal-close:hover { background: var(--surface); color: var(--text); }
+
+  .modal-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 12px;
+  }
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px; font-weight: 700;
+    color: var(--text); margin-bottom: 8px; line-height: 1.2;
+  }
+  .modal-sub {
+    font-size: 14px; color: var(--muted);
+    font-weight: 300; line-height: 1.6; margin-bottom: 28px;
+  }
+  .modal-field { margin-bottom: 16px; }
+  .modal-label {
+    display: block; font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  .modal-input {
+    width: 100%; padding: 13px 16px;
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 4px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 15px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .modal-input:focus { border-color: var(--gold); }
+  .modal-input::placeholder { color: var(--subtle); }
+
+  .modal-send {
+    width: 100%; padding: 15px 24px;
+    background: var(--gold); border: none; border-radius: 4px;
+    color: #000; font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 700; letter-spacing: 0.03em;
+    cursor: pointer; transition: all 0.2s; margin-top: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .modal-send:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
+  .modal-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .modal-privacy {
+    font-size: 11px; color: var(--muted); text-align: center;
+    margin-top: 14px; font-family: 'DM Mono', monospace; letter-spacing: 0.05em;
+  }
+  .modal-status {
+    margin-top: 16px; padding: 12px 16px; border-radius: 4px;
+    font-size: 14px; text-align: center; display: none;
+  }
+  .modal-status.success { background: rgba(74,173,122,0.12); border: 1px solid rgba(74,173,122,0.3); color: var(--green); display: block; }
+  .modal-status.error   { background: rgba(224,92,74,0.12);  border: 1px solid rgba(224,92,74,0.3);  color: var(--red);   display: block; }
+
+  /* Email me button — sits between CTA card and reset */
+  .btn-email-results {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin: 20px auto 0; padding: 14px 28px;
+    background: transparent; border: 1.5px solid var(--gold);
+    border-radius: 4px; color: var(--gold);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+    letter-spacing: 0.03em; cursor: pointer; transition: all 0.2s;
+    width: 100%;
+  }
+  .btn-email-results:hover { background: var(--gold-dim); }
+
+  /* Social proof card */
+  .social-proof-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--gold); border-radius: 8px;
+    padding: 28px 32px; margin-bottom: 14px;
+  }
+  .proof-tag { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+  .proof-stars { color: var(--gold); font-size: 13px; letter-spacing: 3px; margin-bottom: 14px; }
+  .proof-quote { font-family: 'Playfair Display', serif; font-size: 17px; font-style: italic; color: var(--text); line-height: 1.65; margin-bottom: 18px; }
+  .proof-attribution { display: flex; align-items: center; gap: 12px; }
+  .proof-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.4); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--gold); flex-shrink: 0; }
+  .proof-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .proof-detail { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
+
+  /* Low-score nudge */
+  .low-score-nudge { display: none; background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.2); border-radius: 6px; padding: 16px 20px; margin-top: 16px; font-size: 13px; color: var(--muted); line-height: 1.7; text-align: center; }
+  .low-score-nudge strong { color: var(--gold); }
+  .low-score-nudge.visible { display: block; }
+
+  /* Urgency line */
+  .urgency-line { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(0,0,0,0.5); position: relative; z-index: 1; }
+  .urgency-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(0,0,0,0.4); animation: pulse 2s infinite; flex-shrink: 0; }
+
+  @media (max-width: 600px) {
+    header { padding: 16px 20px; }
+    .hero { padding: 50px 20px 40px; }
+    .calc-container { padding: 0 16px; }
+    #results { padding: 0 16px 80px; }
+    .options-grid.cols-2 { grid-template-columns: 1fr; }
+    .metrics-grid { grid-template-columns: 1fr; }
+    .metric-card.featured { grid-column: span 1; }
+    .opp-comparison { grid-template-columns: 1fr; }
+    .opp-arrow { transform: rotate(90deg); }
+    .roi-timeline { grid-template-columns: 1fr; }
+    .tally-bar { padding: 12px 20px; }
+    .cta-card { padding: 32px 24px; }
+    .cta-guarantees { flex-direction: column; gap: 10px; }
+    .hero-meta { flex-direction: column; gap: 10px; }
+  }
+</style>
+<!-- Meta Pixel -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1695124645149797');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1695124645149797&ev=PageView&noscript=1"/></noscript>
+<!-- End Meta Pixel -->
+</head>
+<body>
+
+<!-- Sticky tally — FIX: starts hidden via class, display:none -->
+<div class="tally-bar hidden" id="tallyBar">
+  <div>
+    <div class="tally-label">Your current annual cost of doing nothing</div>
+    <div class="tally-per">Based on your answers so far</div>
+  </div>
+  <div class="tally-amount" id="tallyAmount">$0</div>
+</div>
+
+<header>
+  <div class="logo">
+    <div class="logo-main">James Harvey Digital Marketing</div>
+  </div>
+  <div class="header-badge">
+    <div class="badge-dot"></div>
+    Free Tool · No Email Required
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">⚡ Texas SMB AI Automation Audit</div>
+  <h1>Find out what your<br><em>manual processes</em><br>are really costing you</h1>
+  <p class="hero-sub">In under 3 minutes, see the dollar figure your team is burning every year — and whether AI automation could fix it for a fraction of that cost.</p>
+  <div class="hero-meta">
+    <span>Under 3 minutes</span>
+    <span>No email required</span>
+    <span>No sales pressure</span>
+  </div>
+  <div class="scroll-hint">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    Start the assessment
+  </div>
+</div>
+
+<div class="calc-container" id="calcSection">
+  <div class="progress-track" id="progressTrack"></div>
+  <div class="step-label">
+    <div class="step-label-text" id="stepLabelText">Your business</div>
+    <div class="step-counter" id="stepCounter">Step 1 of 6</div>
+  </div>
+
+  <!-- STEP 1: Industry -->
+  <div class="step active" id="step-1">
+    <div class="step-question">What industry is your business in?</div>
+    <div class="step-hint">This shapes your full cost estimate. Pick the closest match.</div>
+    <div class="options-grid cols-2">
+      <div class="option-card" data-step="1" data-value="lawn" data-label="Lawn &amp; Landscaping" onclick="selectOption(this)">
+        <div class="option-icon">🌿</div>
+        <div class="option-text"><div class="option-label">Lawn &amp; Landscaping</div><div class="option-desc">Mowing, fertilization, tree service</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" data-step="1" data-value="plumbing" data-label="Plumbing / HVAC" onclick="selectOption(this)">
+        <div class="option-icon">🔧</div>
+        <div class="option-text"><div class="option-label">Plumbing / HVAC</div><div class="option-desc">Residential &amp; commercial service</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" data-step="1" data-value="roofing" data-label="Roofing / Construction" onclick="selectOption(this)">
+        <div class="option-icon">🏗️</div>
+        <div class="option-text"><div class="option-label">Roofing / Construction</div><div class="option-desc">Residential roofing, remodeling</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" data-step="1" data-value="legal" data-label="Legal / Professional" onclick="selectOption(this)">
+        <div class="option-icon">⚖️</div>
+        <div class="option-text"><div class="option-label">Legal / Professional</div><div class="option-desc">Law firms, consultants, agencies</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" data-step="1" data-value="medical" data-label="Medical / Dental" onclick="selectOption(this)">
+        <div class="option-icon">🦷</div>
+        <div class="option-text"><div class="option-label">Medical / Dental</div><div class="option-desc">Private practice, specialty clinics</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" data-step="1" data-value="other" data-label="Other Service Business" onclick="selectOption(this)">
+        <div class="option-icon">📋</div>
+        <div class="option-text"><div class="option-label">Other Service Business</div><div class="option-desc">Retail, real estate, field service</div></div>
+        <div class="option-check"></div>
+      </div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-next" id="next-1" onclick="goNext(1)" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Team size -->
+  <div class="step" id="step-2">
+    <div class="step-question">How many people work in your business?</div>
+    <div class="step-hint">Including part-time staff. This helps estimate your total labor exposure.</div>
+    <div class="options-grid">
+      <div class="option-card" data-step="2" data-value="1" onclick="selectOption(this)">
+        <div class="option-icon">👤</div>
+        <div class="option-text"><div class="option-label">Just me</div><div class="option-desc">Solo operator wearing all the hats</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" data-step="2" data-value="5" onclick="selectOption(this)">
+        <div class="option-icon">👥</div>
+        <div class="option-text"><div class="option-label">2–5 people</div><div class="option-desc">Small crew or team</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" data-step="2" data-value="15" onclick="selectOption(this)">
+        <div class="option-icon">🏢</div>
+        <div class="option-text"><div class="option-label">6–20 people</div><div class="option-desc">Growing operation</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" data-step="2" data-value="40" onclick="selectOption(this)">
+        <div class="option-icon">🏭</div>
+        <div class="option-text"><div class="option-label">21–50 people</div><div class="option-desc">Established mid-size business</div></div>
+        <div class="option-check"></div>
+      </div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="goBack(2)">← Back</button>
+      <button class="btn-next" id="next-2" onclick="goNext(2)" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Pain points (multi-select) -->
+  <div class="step" id="step-3">
+    <div class="step-question">Where is your team losing time?</div>
+    <div class="step-hint">Select all that apply. Be honest — most businesses check more than they expect.</div>
+    <div class="multi-hint">Select all that apply</div>
+    <div class="options-grid" id="pains-grid">
+      <div class="option-card multi" data-step="3" data-value="followup" data-hours="2" onclick="toggleMulti(this)">
+        <div class="option-icon">📞</div>
+        <div class="option-text"><div class="option-label">Manual follow-up calls &amp; texts</div><div class="option-desc">Chasing leads, checking on clients, scheduling reminders by hand</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card multi" data-step="3" data-value="scheduling" data-hours="2" onclick="toggleMulti(this)">
+        <div class="option-icon">📅</div>
+        <div class="option-text"><div class="option-label">Scheduling &amp; dispatch</div><div class="option-desc">Back-and-forth to book jobs, manually updating the calendar</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card multi" data-step="3" data-value="invoicing" data-hours="2" onclick="toggleMulti(this)">
+        <div class="option-icon">🧾</div>
+        <div class="option-text"><div class="option-label">Invoicing &amp; payment collection</div><div class="option-desc">Creating invoices manually, chasing unpaid bills</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card multi" data-step="3" data-value="reviews" data-hours="1" onclick="toggleMulti(this)">
+        <div class="option-icon">⭐</div>
+        <div class="option-text"><div class="option-label">Review &amp; reputation management</div><div class="option-desc">Asking for reviews one at a time, manually responding</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card multi" data-step="3" data-value="reporting" data-hours="2" onclick="toggleMulti(this)">
+        <div class="option-icon">📊</div>
+        <div class="option-text"><div class="option-label">Reporting &amp; data entry</div><div class="option-desc">Pulling numbers from multiple places, updating spreadsheets</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card multi" data-step="3" data-value="intake" data-hours="2" onclick="toggleMulti(this)">
+        <div class="option-icon">📋</div>
+        <div class="option-text"><div class="option-label">Lead intake &amp; qualification</div><div class="option-desc">Manually triaging new leads, answering the same questions repeatedly</div></div>
+        <div class="option-check"></div>
+      </div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="goBack(3)">← Back</button>
+      <button class="btn-next" id="next-3" onclick="goNext(3)" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Hourly cost — FIX: use .deco/.num spans for correct sizing -->
+  <div class="step" id="step-4">
+    <div class="step-question">What's the average hourly cost of your team's time?</div>
+    <div class="step-hint">Include wages, payroll taxes, and benefits. Even rough estimates work fine.</div>
+    <div class="slider-wrap">
+      <div class="slider-display">
+        <span class="deco">$</span><span class="num" id="hourlyDisplay">25</span><span class="deco">/hr</span>
+      </div>
+      <input type="range" id="hourlySlider" min="15" max="150" value="25" step="5" oninput="updateSlider()">
+      <div class="slider-labels"><span>$15/hr</span><span>$150/hr</span></div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="goBack(4)">← Back</button>
+      <button class="btn-next" id="next-4" onclick="goNext(4)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: Lost leads -->
+  <div class="step" id="step-5">
+    <div class="step-question">How many leads or customers do you lose each month because of slow follow-up or no-shows?</div>
+    <div class="step-hint">Think about leads that went cold, quotes that never got answered, or jobs that fell through the cracks.</div>
+    <div class="options-grid cols-2">
+      <div class="option-card" data-step="5" data-value="0" onclick="selectOption(this)">
+        <div class="option-icon">🤷</div>
+        <div class="option-text"><div class="option-label">None that I know of</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" data-step="5" data-value="2" onclick="selectOption(this)">
+        <div class="option-icon">😬</div>
+        <div class="option-text"><div class="option-label">1–3 per month</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" data-step="5" data-value="6" onclick="selectOption(this)">
+        <div class="option-icon">😟</div>
+        <div class="option-text"><div class="option-label">4–8 per month</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" data-step="5" data-value="15" onclick="selectOption(this)">
+        <div class="option-icon">🚨</div>
+        <div class="option-text"><div class="option-label">10+ per month</div></div>
+        <div class="option-check"></div>
+      </div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="goBack(5)">← Back</button>
+      <button class="btn-next" id="next-5" onclick="goNext(5)" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 6: Average job value -->
+  <div class="step" id="step-6">
+    <div class="step-question">What's the average value of a job or client to your business?</div>
+    <div class="step-hint">Think about the average invoice or monthly retainer per customer.</div>
+    <div class="options-grid cols-2">
+      <div class="option-card" data-step="6" data-value="300" onclick="selectOption(this)">
+        <div class="option-icon">💵</div>
+        <div class="option-text"><div class="option-label">Under $500</div><div class="option-desc">Small residential jobs</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" data-step="6" data-value="1000" onclick="selectOption(this)">
+        <div class="option-icon">💵💵</div>
+        <div class="option-text"><div class="option-label">$500–$1,500</div><div class="option-desc">Mid-range services</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" data-step="6" data-value="3500" onclick="selectOption(this)">
+        <div class="option-icon">💵💵💵</div>
+        <div class="option-text"><div class="option-label">$1,500–$5,000</div><div class="option-desc">Project-based work</div></div>
+        <div class="option-check"></div>
+      </div>
+      <div class="option-card" data-step="6" data-value="10000" onclick="selectOption(this)">
+        <div class="option-icon">💎</div>
+        <div class="option-text"><div class="option-label">$5,000+</div><div class="option-desc">Large contracts or retainers</div></div>
+        <div class="option-check"></div>
+      </div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="goBack(6)">← Back</button>
+      <button class="btn-next" id="next-6" onclick="showResults()" disabled>See My Results →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Results -->
+<div id="results">
+  <div class="results-header">
+    <div class="results-eyebrow">Your Automation Audit Results</div>
+    <h2 class="results-headline">
+      Your business is leaking
+      <em class="cost-reveal" id="resultsHero">$0</em>
+      every year.
+    </h2>
+    <p class="results-sub" id="resultsSub">Here's exactly where it's going — and what AI automation could recover for you.</p>
+    <div class="low-score-nudge" id="lowScoreNudge">
+      <strong>Note:</strong> This is a conservative floor estimate based on your inputs. Most business owners find the real number is 2–3× higher once we dig into their actual workflow in a 30-minute audit call.
+    </div>
+  </div>
+
+  <div class="metrics-grid">
+    <div class="metric-card featured">
+      <div class="metric-tag">Total Annual Cost of Doing Nothing</div>
+      <div class="metric-value" id="totalLoss">$0</div>
+      <div class="metric-sub">Across labor waste, lost leads, and missed revenue</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-tag">Annual Labor Waste</div>
+      <div class="metric-value" id="laborLoss">$0</div>
+      <div class="metric-sub">Hours burned on tasks AI can handle</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-tag">Lost Lead Revenue / Year</div>
+      <div class="metric-value" id="leadLoss">$0</div>
+      <div class="metric-sub">Jobs that fell through the cracks</div>
+    </div>
+  </div>
+
+  <div class="breakdown-card">
+    <div class="breakdown-title">Where the money goes</div>
+    <div id="breakdownRows"></div>
+  </div>
+
+  <div class="opportunity-card">
+    <div class="opp-title">What AI Automation Could Return</div>
+    <div class="opp-comparison">
+      <div class="opp-side bad">
+        <div class="opp-label">Status Quo (annual)</div>
+        <div class="opp-val red" id="oppBad">$0</div>
+      </div>
+      <div class="opp-arrow">→</div>
+      <div class="opp-side good">
+        <div class="opp-label">Net savings with JHDM</div>
+        <div class="opp-val green" id="oppGood">$0</div>
+      </div>
+    </div>
+    <div class="roi-timeline">
+      <div class="roi-point">
+        <div class="roi-year">Year 1 Net Savings</div>
+        <div class="roi-val" id="roi1">$0</div>
+      </div>
+      <div class="roi-point">
+        <div class="roi-year">Year 3 Net Savings</div>
+        <div class="roi-val" id="roi3">$0</div>
+      </div>
+      <div class="roi-point">
+        <div class="roi-year">Year 5 Net Savings</div>
+        <div class="roi-val" id="roi5">$0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="recommendation-card">
+    <div class="rec-tag">Your Personalized Recommendation</div>
+    <div class="rec-headline" id="recHeadline"></div>
+    <div class="rec-body" id="recBody"></div>
+    <div class="rec-items" id="recItems"></div>
+  </div>
+
+  <!-- Social proof — sits above CTA to build trust before the ask -->
+  <div class="social-proof-card">
+    <div class="proof-tag">What Texas business owners are saying</div>
+    <div class="proof-stars">★★★★★</div>
+    <div class="proof-quote">"I honestly thought the calculator was going to be one of those fake tools that just shows you a big number to scare you. But the math was real — and so was the $38K we were losing. We automated 3 workflows in the first month and the difference was immediate."</div>
+    <div class="proof-attribution">
+      <div class="proof-avatar">R</div>
+      <div>
+        <div class="proof-name">Rafael M.</div>
+        <div class="proof-detail">Owner · Rangel Tree Service · San Antonio, TX</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-card">
+    <div class="cta-eyebrow">Your next step</div>
+    <h3 class="cta-headline">Let's recover that money.<br>30 minutes. No obligation.</h3>
+    <p class="cta-sub">Book a free AI Automation Audit call. We'll walk through your results, identify the top 2–3 workflows to automate first, and give you a clear plan — whether you hire us or not.</p>
+    <a href="https://jamesharveydigitalmarketing.com/#contact" class="cta-btn" target="_blank">
+      Book My Free Audit Call →
+    </a>
+    <div class="cta-guarantees">
+      <div class="cta-guarantee">✓ No pitch</div>
+      <div class="cta-guarantee">✓ No contracts</div>
+      <div class="cta-guarantee">✓ You keep the plan</div>
+    </div>
+    <div class="urgency-line">
+      <div class="urgency-dot"></div>
+      We take on 4 new clients per month · 2 spots currently open
+    </div>
+  </div>
+  <button class="btn-email-results" onclick="openEmailModal()">
+    📧 Optional — Email me my results
+  </button>
+  <button class="btn-reset" onclick="resetCalc()">Start over</button>
+</div>
+
+<!-- Email Modal -->
+<div class="modal-overlay" id="emailModal" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeEmailModal()" aria-label="Close">✕</button>
+    <div class="modal-eyebrow">Your free results report</div>
+    <div class="modal-title">Send my audit results</div>
+    <p class="modal-sub">We'll email you a full copy of your results — no follow-up unless you reach out first.</p>
+    <div class="modal-field">
+      <label class="modal-label" for="emailName">Your first name</label>
+      <input class="modal-input" id="emailName" type="text" placeholder="e.g. James" autocomplete="given-name">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label" for="emailAddress">Your email address</label>
+      <input class="modal-input" id="emailAddress" type="email" placeholder="you@yourbusiness.com" autocomplete="email">
+    </div>
+    <button class="modal-send" id="modalSendBtn" onclick="sendResults()">
+      <span id="sendBtnText">Send My Results →</span>
+    </button>
+    <p class="modal-privacy">✓ No spam · Results only · Unsubscribe anytime</p>
+    <div class="modal-status" id="modalStatus"></div>
+  </div>
+</div>
+
+<script>
+  // ── STATE ──
+  const state = {
+    industry: null, industryLabel: null,
+    teamSize: null,
+    pains: [], painHours: 0,
+    hourlyRate: 25,
+    lostLeads: null,  // null = not yet answered; 0 = answered "none"
+    jobValue: null,
+    currentStep: 1,
+    totalSteps: 6
+  };
+
+  const stepLabels = ['Your business','Team size','Pain points','Labor cost','Lost leads','Job value'];
+
+  // ── PROGRESS ──
+  function initProgress() {
+    const track = document.getElementById('progressTrack');
+    track.innerHTML = '';
+    for (let i = 1; i <= state.totalSteps; i++) {
+      const seg = document.createElement('div');
+      seg.className = 'progress-seg' + (i === state.currentStep ? ' active' : i < state.currentStep ? ' done' : '');
+      track.appendChild(seg);
+    }
+    document.getElementById('stepLabelText').textContent = stepLabels[state.currentStep - 1];
+    document.getElementById('stepCounter').textContent = `Step ${state.currentStep} of ${state.totalSteps}`;
+  }
+
+  // ── SINGLE-SELECT ──
+  function selectOption(card) {
+    const step = card.dataset.step;
+    // Deselect siblings
+    document.querySelectorAll(`[data-step="${step}"]`).forEach(c => {
+      c.classList.remove('selected');
+      c.querySelector('.option-check').textContent = '';
+    });
+    card.classList.add('selected');
+    card.querySelector('.option-check').textContent = '✓';
+
+    // FIX: use parseInt with fallback; lostLeads=0 is valid
+    if (step === '1') { state.industry = card.dataset.value; state.industryLabel = card.dataset.label; }
+    if (step === '2') state.teamSize = parseInt(card.dataset.value, 10);
+    if (step === '5') state.lostLeads = parseInt(card.dataset.value, 10); // 0 is valid
+    if (step === '6') state.jobValue  = parseInt(card.dataset.value, 10);
+
+    const btn = document.getElementById(`next-${step}`);
+    if (btn) btn.disabled = false;
+    updateTally();
+  }
+
+  // ── MULTI-SELECT ──
+  function toggleMulti(card) {
+    card.classList.toggle('selected');
+    card.querySelector('.option-check').textContent = card.classList.contains('selected') ? '✓' : '';
+
+    state.pains = [];
+    state.painHours = 0;
+    document.querySelectorAll('#pains-grid .selected').forEach(c => {
+      state.pains.push(c.dataset.value);
+      state.painHours += parseInt(c.dataset.hours, 10);
+    });
+
+    document.getElementById('next-3').disabled = state.pains.length === 0;
+    updateTally();
+  }
+
+  // ── SLIDER ──
+  function updateSlider() {
+    state.hourlyRate = parseInt(document.getElementById('hourlySlider').value, 10);
+    document.getElementById('hourlyDisplay').textContent = state.hourlyRate;
+    updateTally();
+  }
+
+  // ── NAV ──
+  function goNext(step) {
+    document.getElementById(`step-${step}`).classList.remove('active');
+    state.currentStep = step + 1;
+    document.getElementById(`step-${state.currentStep}`).classList.add('active');
+    initProgress();
+    window.scrollTo({ top: document.getElementById('calcSection').offsetTop - 80, behavior: 'smooth' });
+  }
+
+  function goBack(step) {
+    document.getElementById(`step-${step}`).classList.remove('active');
+    state.currentStep = step - 1;
+    document.getElementById(`step-${state.currentStep}`).classList.add('active');
+    initProgress();
+    window.scrollTo({ top: document.getElementById('calcSection').offsetTop - 80, behavior: 'smooth' });
+  }
+
+  // ── TALLY ──
+  function updateTally() {
+    const bar = document.getElementById('tallyBar');
+    // Only show once user has answered at least pains + team size
+    if (state.currentStep >= 3 && state.pains.length > 0 && state.teamSize) {
+      const calc = calcNumbers();
+      if (calc.totalLoss > 0) {
+        bar.classList.remove('hidden');
+        document.getElementById('tallyAmount').textContent = fmt(calc.totalLoss);
+        return;
+      }
+    }
+    bar.classList.add('hidden');
+  }
+
+  // ── CALCULATIONS ──
+  // Conservative assumptions:
+  //   Team cap: 3 (not all staff are affected equally)
+  //   Pain hours per checkbox: 1–2 hrs/week each
+  //   Opportunity cost: 10% add-on on labor only
+  //   Labor recovery: 45%
+  //   Lead recovery: 60%
+  //   Automation cost: $397/mo ($4,764/yr)
+  function calcNumbers() {
+    const weeksPerYear = 52;
+    const hoursPerWeek = state.painHours || 0;
+    const teamSize     = state.teamSize   || 1;
+    const hourly       = state.hourlyRate || 25;
+    const lostLeads    = (state.lostLeads !== null) ? state.lostLeads : 0;
+    const jobValue     = state.jobValue   || 500;
+
+    const laborAnnual  = Math.min(teamSize, 3) * hoursPerWeek * hourly * weeksPerYear;
+    const leadAnnual   = lostLeads * jobValue * 12;
+    const oppCost      = laborAnnual * 0.10;
+    const totalLoss    = laborAnnual + leadAnnual + oppCost;
+
+    const automationCost  = 397 * 12; // $4,764/yr
+    const laborRecovery   = laborAnnual * 0.45;
+    const leadRecovery    = leadAnnual  * 0.60;
+    const totalRecovery   = laborRecovery + leadRecovery;
+
+    // FIX: net values can be negative — keep raw so UI can handle them properly
+    const netY1 = totalRecovery       - automationCost;
+    const netY3 = totalRecovery * 3   - automationCost * 3;
+    const netY5 = totalRecovery * 5   - automationCost * 5;
+
+    return { laborAnnual, leadAnnual, oppCost, totalLoss, totalRecovery, netY1, netY3, netY5, automationCost };
+  }
+
+  // ── FORMAT ──
+  function fmt(n) {
+    if (n >= 1000000) return '$' + (n / 1000000).toFixed(1) + 'M';
+    if (n >= 1000)    return '$' + Math.round(n / 1000) + 'K';
+    return '$' + Math.round(n).toLocaleString();
+  }
+
+  // Format ROI — human-readable labels instead of zeros or negatives
+  function fmtRoi(n) {
+    if (n <= 0)   return 'Covered by Year 1';
+    if (n < 1000) return '< $1K';
+    return fmt(n);
+  }
+
+  // ── RESULTS ──
+  function showResults() {
+    document.getElementById('calcSection').style.display = 'none';
+    document.getElementById('tallyBar').classList.add('hidden'); // FIX: always hide tally on results
+
+    const n = calcNumbers();
+    document.getElementById('results').style.display = 'block';
+
+    // Hero
+    document.getElementById('resultsHero').textContent = fmt(n.totalLoss);
+    document.getElementById('totalLoss').textContent   = fmt(n.totalLoss);
+    document.getElementById('laborLoss').textContent   = fmt(n.laborAnnual);
+    document.getElementById('leadLoss').textContent    = fmt(n.leadAnnual);
+    document.getElementById('resultsSub').textContent  =
+      `Here's exactly where ${state.industryLabel || 'your business'} is bleeding money — and what AI automation could recover.`;
+
+    // Low-score nudge: show when total loss is under $10K so small numbers feel like a floor, not a ceiling
+    const nudge = document.getElementById('lowScoreNudge');
+    if (n.totalLoss < 10000) {
+      nudge.classList.add('visible');
+    } else {
+      nudge.classList.remove('visible');
+    }
+
+    // Breakdown rows
+    const PAIN_HOURS = { followup:2, scheduling:2, invoicing:2, reviews:1, reporting:2, intake:2 };
+    const PAIN_META  = {
+      followup:  ['📞','Manual follow-up calls & texts',     'AI voice agents + automated SMS sequences'],
+      scheduling:['📅','Scheduling & dispatch',              'AI booking bot + calendar automation'],
+      invoicing: ['🧾','Invoicing & collections',            'Auto-invoice generation + payment nudges'],
+      reviews:   ['⭐','Review management',                  'Automated review requests + AI response drafting'],
+      reporting: ['📊','Reporting & data entry',             'Automated dashboards + data pipelines'],
+      intake:    ['📋','Lead intake & qualification',        'AI intake forms + instant lead scoring'],
+    };
+    const rows = [];
+    state.pains.forEach(pain => {
+      const m = PAIN_META[pain];
+      if (!m) return;
+      const hrs  = PAIN_HOURS[pain] || 2;
+      const cost = Math.min(state.teamSize, 3) * hrs * state.hourlyRate * 52;
+      rows.push({ icon: m[0], name: m[1], desc: m[2], cost });
+    });
+    if (n.leadAnnual > 0) {
+      rows.push({ icon:'🚪', name:'Lost leads (slow follow-up)', desc:'AI can respond to new leads in under 60 seconds', cost: n.leadAnnual });
+    }
+    if (n.oppCost > 0) {
+      rows.push({ icon:'⏱️', name:"Growth time you can't pursue", desc:'Hours spent on admin = strategy you\'re not executing (10% add-on)', cost: n.oppCost });
+    }
+    document.getElementById('breakdownRows').innerHTML = rows.map(r => `
+      <div class="breakdown-row">
+        <div class="breakdown-left">
+          <div class="breakdown-icon">${r.icon}</div>
+          <div><div class="breakdown-name">${r.name}</div><div class="breakdown-desc">${r.desc}</div></div>
+        </div>
+        <div class="breakdown-amount">${fmt(r.cost)}/yr</div>
+      </div>`).join('');
+
+    // FIX: oppGood shows net recovery (totalRecovery - automationCost), not totalLoss - automationCost
+    document.getElementById('oppBad').textContent  = fmt(n.totalLoss) + '/yr lost';
+    document.getElementById('oppGood').textContent = n.totalRecovery > n.automationCost
+      ? fmt(n.totalRecovery - n.automationCost) + '/yr saved'
+      : 'Pays for itself';
+
+    // FIX: ROI uses fmtRoi() so negatives show "Break even" not "$0" or negative number
+    document.getElementById('roi1').textContent = fmtRoi(n.netY1);
+    document.getElementById('roi3').textContent = fmtRoi(n.netY3);
+    document.getElementById('roi5').textContent = fmtRoi(n.netY5);
+
+    // Recommendation — FIX: lower threshold to $15K so SMBs actually reach the top tier
+    const recs = getRecommendation(n);
+    document.getElementById('recHeadline').textContent = recs.headline;
+    document.getElementById('recBody').textContent     = recs.body;
+    document.getElementById('recItems').innerHTML = recs.items.map((item, i) => `
+      <div class="rec-item">
+        <div class="rec-item-num">0${i+1}</div>
+        <div class="rec-item-text"><strong>${item.title}</strong><br><span>${item.desc}</span></div>
+      </div>`).join('');
+
+    fbq('track', 'ViewContent', {
+      content_name: 'Audit Results',
+      content_category: state.industryLabel || 'Unknown',
+      value: n.totalLoss,
+      currency: 'USD'
+    });
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function getRecommendation(n) {
+    // FIX: threshold lowered from $50K to $15K — realistic for 1–5 person SMBs
+    const highLoss  = n.totalLoss > 15000;
+    const manyPains = state.pains.length >= 3;
+    const hasLeads  = state.lostLeads > 2;
+
+    if (highLoss && manyPains) {
+      return {
+        headline: "You need a full AI automation stack — and you need it now.",
+        body: `With ${fmt(n.totalLoss)} walking out the door annually, every month you wait costs real money. Most of what's burning your team can be automated within 30–60 days.`,
+        items: [
+          { title: "AI Voice Agent for Lead Intake",    desc: "Answers inbound calls 24/7, qualifies leads instantly, books jobs while you sleep" },
+          { title: "Automated Follow-Up Sequences",     desc: "Text + email sequences triggered the second a lead comes in — no more dropped balls" },
+          { title: "Custom CRM + Workflow Automation",  desc: "All your jobs, clients, and follow-ups in one place, automated from quote to close" },
+        ]
+      };
+    } else if (hasLeads) {
+      return {
+        headline: "Your biggest leak is lost leads. Let's plug it first.",
+        body: `You're losing jobs because competitors respond faster. AI can respond to new leads in under 60 seconds — at 2am, on weekends, even while you're on a job site.`,
+        items: [
+          { title: "AI Lead Response Bot",            desc: "Instant text/email response to every new inquiry — responds faster than any human" },
+          { title: "Automated Booking & Scheduling",  desc: "Lets leads book a job or call without playing phone tag" },
+          { title: "Follow-Up Drip Sequence",         desc: "5-touch automated sequence so no lead goes cold" },
+        ]
+      };
+    } else {
+      return {
+        headline: "A few targeted automations could make a real dent.",
+        body: `You don't need a massive overhaul. The right 2–3 automations for your specific workflow could recover most of that time and cost within the first month.`,
+        items: [
+          { title: "Workflow Audit",                      desc: "We map your top 3 time sinks and design the automation for each" },
+          { title: "Quick-Win Automation",                desc: "Deploy one high-impact automation in under 2 weeks to prove the ROI" },
+          { title: "Review & Reputation Automation",      desc: "Automatically request and respond to Google reviews — boost rankings on autopilot" },
+        ]
+      };
+    }
+  }
+
+  // ── RESET — FIX: re-enable step 4 button after reset ──
+  function resetCalc() {
+    Object.assign(state, {
+      industry: null, industryLabel: null, teamSize: null,
+      pains: [], painHours: 0, hourlyRate: 25,
+      lostLeads: null, jobValue: null, currentStep: 1
+    });
+    document.querySelectorAll('.option-card').forEach(c => {
+      c.classList.remove('selected');
+      c.querySelector('.option-check').textContent = '';
+    });
+    // Disable all next buttons, then re-enable step 4 (slider is always valid)
+    document.querySelectorAll('.btn-next').forEach(b => { b.disabled = true; });
+    document.getElementById('next-4').disabled = false;
+
+    document.getElementById('hourlySlider').value = 25;
+    document.getElementById('hourlyDisplay').textContent = 25;
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step-1').classList.add('active');
+    document.getElementById('calcSection').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('tallyBar').classList.add('hidden');
+    state.currentStep = 1;
+    initProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── EMAILJS CONFIG ──
+  // ⚠️  SETUP REQUIRED — replace these three values with yours from emailjs.com:
+  //   1. Go to https://emailjs.com → create a free account
+  //   2. Add an Email Service (Gmail works) → copy the Service ID
+  //   3. Create an Email Template (see template variables below) → copy the Template ID
+  //   4. Go to Account → copy your Public Key
+  const EMAILJS_PUBLIC_KEY  = '99tu4cj8XC2hIq7L8';
+  const EMAILJS_SERVICE_ID  = 'service_3gtd9y8';
+  const EMAILJS_TEMPLATE_ID = 'template_gf0962r';
+
+  // n8n webhook — create a Webhook node in n8n with path "jhdm-leads" (POST, no auth)
+  const N8N_WEBHOOK_URL = 'https://n8n.srv912849.hstgr.cloud/webhook/jhdm-leads';
+  // EmailJS template should use these variables:
+  //   {{to_name}}       — recipient first name
+  //   {{to_email}}      — recipient email
+  //   {{email_body}}    — the full HTML results (paste as HTML in template)
+
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+
+  // ── MODAL ──
+  function openEmailModal() {
+    document.getElementById('emailModal').classList.add('open');
+    document.getElementById('modalStatus').className = 'modal-status';
+    document.getElementById('modalStatus').textContent = '';
+    document.getElementById('modalSendBtn').disabled = false;
+    document.getElementById('sendBtnText').textContent = 'Send My Results →';
+    // Pre-clear fields each open
+    document.getElementById('emailName').value = '';
+    document.getElementById('emailAddress').value = '';
+    setTimeout(() => document.getElementById('emailName').focus(), 100);
+  }
+
+  function closeEmailModal() {
+    document.getElementById('emailModal').classList.remove('open');
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('emailModal')) closeEmailModal();
+  }
+
+  // Close on Escape key
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeEmailModal();
+  });
+
+  // ── BUILD EMAIL HTML ──
+  function buildEmailHTML(name, n, rows, recs) {
+    const recItemsHTML = recs.items.map((item, i) => `
+      <tr>
+        <td style="padding:12px 0;border-bottom:1px solid #2a3040;vertical-align:top;">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td width="32" style="font-family:monospace;font-size:11px;color:#c9a84c;padding-top:2px;vertical-align:top;">0${i+1}</td>
+            <td style="padding-left:8px;">
+              <div style="font-size:14px;font-weight:600;color:#e8e4dc;margin-bottom:3px;">${item.title}</div>
+              <div style="font-size:13px;color:#8a8f9e;">${item.desc}</div>
+            </td>
+          </tr></table>
+        </td>
+      </tr>`).join('');
+
+    const breakdownRowsHTML = rows.map(r => `
+      <tr>
+        <td style="padding:12px 0;border-bottom:1px solid #2a3040;">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr>
+            <td width="36" style="text-align:center;font-size:18px;vertical-align:middle;">${r.icon}</td>
+            <td style="padding-left:12px;vertical-align:middle;">
+              <div style="font-size:14px;font-weight:500;color:#e8e4dc;">${r.name}</div>
+              <div style="font-size:12px;color:#8a8f9e;">${r.desc}</div>
+            </td>
+            <td style="text-align:right;font-family:monospace;font-size:15px;color:#e05c4a;white-space:nowrap;vertical-align:middle;">${fmt(r.cost)}/yr</td>
+          </tr></table>
+        </td>
+      </tr>`).join('');
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Your AI Automation Audit Results</title></head>
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:32px 16px;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+  <!-- Header -->
+  <tr><td style="padding:0 0 32px 0;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td>
+          <div style="font-family:monospace;font-size:18px;font-weight:700;color:#e8e4dc;">James Harvey Digital Marketing</div>
+        </td>
+        <td align="right">
+          <div style="font-family:monospace;font-size:10px;letter-spacing:0.2em;color:#8a8f9e;text-transform:uppercase;">Houston, Texas</div>
+        </td>
+      </tr>
+    </table>
+    <div style="height:1px;background:#2a3040;margin-top:16px;"></div>
+  </td></tr>
+
+  <!-- Hero -->
+  <tr><td style="text-align:center;padding:40px 0 32px;">
+    <div style="font-family:monospace;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:#c9a84c;margin-bottom:16px;">Your Automation Audit Results</div>
+    <div style="font-size:32px;font-weight:900;color:#e8e4dc;line-height:1.15;margin-bottom:8px;">Hi ${name}, your business<br>is leaking</div>
+    <div style="font-size:52px;font-weight:900;color:#e05c4a;line-height:1;margin-bottom:8px;">${fmt(n.totalLoss)}</div>
+    <div style="font-size:32px;font-weight:900;color:#e8e4dc;line-height:1.15;margin-bottom:16px;">every year.</div>
+    <div style="font-size:15px;color:#8a8f9e;font-weight:300;line-height:1.7;">
+      Here's exactly where ${state.industryLabel || 'your business'} is bleeding money —<br>and what AI automation could recover for you.
+    </div>
+  </td></tr>
+
+  <!-- Big 3 metrics -->
+  <tr><td style="padding:0 0 16px;">
+    <!-- Total (featured) -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.04));border:1px solid rgba(201,168,76,0.4);border-radius:8px;margin-bottom:12px;">
+      <tr><td style="padding:28px;">
+        <div style="font-family:monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#8a8f9e;margin-bottom:10px;">Total Annual Cost of Doing Nothing</div>
+        <div style="font-size:52px;font-weight:900;color:#e05c4a;line-height:1;margin-bottom:6px;">${fmt(n.totalLoss)}</div>
+        <div style="font-size:13px;color:#8a8f9e;">Across labor waste, lost leads, and missed revenue</div>
+      </td></tr>
+    </table>
+    <!-- Labor + Leads side by side -->
+    <table width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td width="49%" style="background:#1e2330;border:1px solid #2a3040;border-radius:8px;padding:24px;vertical-align:top;">
+        <div style="font-family:monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#8a8f9e;margin-bottom:10px;">Annual Labor Waste</div>
+        <div style="font-size:36px;font-weight:900;color:#e05c4a;line-height:1;margin-bottom:6px;">${fmt(n.laborAnnual)}</div>
+        <div style="font-size:12px;color:#8a8f9e;">Hours burned on tasks AI can handle</div>
+      </td>
+      <td width="2%"></td>
+      <td width="49%" style="background:#1e2330;border:1px solid #2a3040;border-radius:8px;padding:24px;vertical-align:top;">
+        <div style="font-family:monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#8a8f9e;margin-bottom:10px;">Lost Lead Revenue / Year</div>
+        <div style="font-size:36px;font-weight:900;color:#e05c4a;line-height:1;margin-bottom:6px;">${fmt(n.leadAnnual)}</div>
+        <div style="font-size:12px;color:#8a8f9e;">Jobs that fell through the cracks</div>
+      </td>
+    </tr></table>
+  </td></tr>
+
+  <!-- Breakdown -->
+  <tr><td style="background:#1e2330;border:1px solid #2a3040;border-radius:8px;padding:28px;margin-bottom:16px;">
+    <div style="font-family:monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#c9a84c;margin-bottom:20px;">Where the money goes</div>
+    <table width="100%" cellpadding="0" cellspacing="0">${breakdownRowsHTML}</table>
+  </td></tr>
+
+  <tr><td style="padding:16px 0;"></td></tr>
+
+  <!-- Opportunity -->
+  <tr><td style="background:linear-gradient(135deg,rgba(74,173,122,0.1),rgba(74,173,122,0.04));border:1px solid rgba(74,173,122,0.3);border-radius:8px;padding:28px;margin-bottom:16px;">
+    <div style="font-family:monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#4aad7a;margin-bottom:20px;">What AI Automation Could Return</div>
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;"><tr>
+      <td width="46%" style="background:rgba(224,92,74,0.1);border:1px solid rgba(224,92,74,0.2);border-radius:6px;padding:18px;text-align:center;vertical-align:middle;">
+        <div style="font-family:monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#8a8f9e;margin-bottom:8px;">Status Quo (annual)</div>
+        <div style="font-size:26px;font-weight:700;color:#e05c4a;">${fmt(n.totalLoss)}/yr lost</div>
+      </td>
+      <td width="8%" style="text-align:center;font-size:22px;color:#8a8f9e;">→</td>
+      <td width="46%" style="background:rgba(74,173,122,0.1);border:1px solid rgba(74,173,122,0.2);border-radius:6px;padding:18px;text-align:center;vertical-align:middle;">
+        <div style="font-family:monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#8a8f9e;margin-bottom:8px;">Net savings with JHDM</div>
+        <div style="font-size:26px;font-weight:700;color:#4aad7a;">${n.totalRecovery > n.automationCost ? fmt(n.totalRecovery - n.automationCost) + '/yr saved' : 'Pays for itself'}</div>
+      </td>
+    </tr></table>
+    <table width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td width="32%" style="background:#181c24;border:1px solid #2a3040;border-radius:6px;padding:14px;text-align:center;">
+        <div style="font-family:monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#8a8f9e;margin-bottom:6px;">Year 1 Net Savings</div>
+        <div style="font-size:20px;font-weight:700;color:#4aad7a;">${fmtRoi(n.netY1)}</div>
+      </td>
+      <td width="2%"></td>
+      <td width="32%" style="background:#181c24;border:1px solid #2a3040;border-radius:6px;padding:14px;text-align:center;">
+        <div style="font-family:monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#8a8f9e;margin-bottom:6px;">Year 3 Net Savings</div>
+        <div style="font-size:20px;font-weight:700;color:#4aad7a;">${fmtRoi(n.netY3)}</div>
+      </td>
+      <td width="2%"></td>
+      <td width="32%" style="background:#181c24;border:1px solid #2a3040;border-radius:6px;padding:14px;text-align:center;">
+        <div style="font-family:monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#8a8f9e;margin-bottom:6px;">Year 5 Net Savings</div>
+        <div style="font-size:20px;font-weight:700;color:#4aad7a;">${fmtRoi(n.netY5)}</div>
+      </td>
+    </tr></table>
+  </td></tr>
+
+  <tr><td style="padding:16px 0;"></td></tr>
+
+  <!-- Recommendation -->
+  <tr><td style="background:#1e2330;border:1px solid #2a3040;border-radius:8px;padding:28px;">
+    <div style="font-family:monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#c9a84c;margin-bottom:14px;">Your Personalized Recommendation</div>
+    <div style="font-size:22px;font-weight:700;color:#e8e4dc;margin-bottom:12px;line-height:1.25;">${recs.headline}</div>
+    <div style="font-size:14px;color:#8a8f9e;line-height:1.8;margin-bottom:20px;font-weight:300;">${recs.body}</div>
+    <table width="100%" cellpadding="0" cellspacing="0">${recItemsHTML}</table>
+  </td></tr>
+
+  <tr><td style="padding:16px 0;"></td></tr>
+
+  <!-- CTA -->
+  <tr><td style="background:#c9a84c;border-radius:8px;padding:40px;text-align:center;">
+    <div style="font-family:monospace;font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(0,0,0,0.5);margin-bottom:14px;">Your next step</div>
+    <div style="font-size:28px;font-weight:900;color:#000;margin-bottom:10px;line-height:1.2;">Let's recover that money.<br>30 minutes. No obligation.</div>
+    <div style="font-size:14px;color:rgba(0,0,0,0.6);margin-bottom:28px;line-height:1.6;font-weight:300;">Book a free AI Automation Audit call. We'll walk through your results, identify the top 2–3 workflows to automate first, and give you a clear plan — whether you hire us or not.</div>
+    <a href="https://jamesharveydigitalmarketing.com/#contact" style="display:inline-block;padding:16px 36px;background:#000;color:#c9a84c;font-size:15px;font-weight:700;letter-spacing:0.04em;text-decoration:none;border-radius:4px;">Book My Free Audit Call →</a>
+    <div style="margin-top:20px;font-family:monospace;font-size:11px;color:rgba(0,0,0,0.45);letter-spacing:0.05em;">✓ No pitch &nbsp;&nbsp; ✓ No contracts &nbsp;&nbsp; ✓ You keep the plan</div>
+  </td></tr>
+
+  <!-- Footer -->
+  <tr><td style="padding:32px 0;text-align:center;">
+    <div style="font-size:12px;color:#3a4055;font-family:monospace;letter-spacing:0.05em;">
+      James Harvey Digital Marketing · Houston, Texas<br>
+      <a href="https://jamesharveydigitalmarketing.com" style="color:#3a4055;">jamesharveydigitalmarketing.com</a>
+    </div>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+  }
+
+  // ── SEND RESULTS ──
+  async function sendResults() {
+    const name  = document.getElementById('emailName').value.trim();
+    const email = document.getElementById('emailAddress').value.trim();
+    const status = document.getElementById('modalStatus');
+    const btn    = document.getElementById('modalSendBtn');
+    const btnTxt = document.getElementById('sendBtnText');
+
+    // Validate
+    if (!name) {
+      status.className = 'modal-status error';
+      status.textContent = 'Please enter your first name.';
+      document.getElementById('emailName').focus();
+      return;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      status.className = 'modal-status error';
+      status.textContent = 'Please enter a valid email address.';
+      document.getElementById('emailAddress').focus();
+      return;
+    }
+
+    // Build data
+    const n    = calcNumbers();
+    const PAIN_HOURS = { followup:2, scheduling:2, invoicing:2, reviews:1, reporting:2, intake:2 };
+    const PAIN_META  = {
+      followup:  ['📞','Manual follow-up calls & texts',     'AI voice agents + automated SMS sequences'],
+      scheduling:['📅','Scheduling & dispatch',              'AI booking bot + calendar automation'],
+      invoicing: ['🧾','Invoicing & collections',            'Auto-invoice generation + payment nudges'],
+      reviews:   ['⭐','Review management',                  'Automated review requests + AI response drafting'],
+      reporting: ['📊','Reporting & data entry',             'Automated dashboards + data pipelines'],
+      intake:    ['📋','Lead intake & qualification',        'AI intake forms + instant lead scoring'],
+    };
+    const rows = [];
+    state.pains.forEach(pain => {
+      const m = PAIN_META[pain]; if (!m) return;
+      const hrs  = PAIN_HOURS[pain] || 2;
+      const cost = Math.min(state.teamSize, 3) * hrs * state.hourlyRate * 52;
+      rows.push({ icon: m[0], name: m[1], desc: m[2], cost });
+    });
+    if (n.leadAnnual > 0) rows.push({ icon:'🚪', name:'Lost leads (slow follow-up)', desc:'AI can respond to new leads in under 60 seconds', cost: n.leadAnnual });
+    if (n.oppCost > 0)    rows.push({ icon:'⏱️', name:"Growth time you can't pursue", desc:"Hours spent on admin = strategy you're not executing", cost: n.oppCost });
+
+    const recs = getRecommendation(n);
+    const emailHTML = buildEmailHTML(name, n, rows, recs);
+
+    // Send via EmailJS
+    btn.disabled = true;
+    btnTxt.textContent = 'Sending…';
+    status.className = 'modal-status';
+
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        to_name:    name,
+        to_email:   email,
+        email_body: emailHTML,
+      });
+      status.className = 'modal-status success';
+      status.textContent = `✓ Results sent to ${email} — check your inbox!`;
+      btnTxt.textContent = 'Sent ✓';
+
+      // Log lead to Supabase via n8n
+      fetch(N8N_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          email,
+          industry: state.industryLabel,
+          team_size: state.teamSize,
+          pains: state.pains,
+          hourly_rate: state.hourlyRate,
+          lost_leads: state.lostLeads,
+          job_value: state.jobValue,
+          total_loss: n.totalLoss,
+          labor_annual: n.laborAnnual,
+          lead_annual: n.leadAnnual,
+          submitted_at: new Date().toISOString(),
+          source: 'audit-calculator'
+        })
+      }).catch(() => {}); // fire-and-forget
+
+      fbq('track', 'Lead', {
+        content_name: 'Audit Results Email',
+        content_category: state.industryLabel || 'Unknown',
+        value: n.totalLoss,
+        currency: 'USD'
+      });
+    } catch (err) {
+      console.error('EmailJS error:', err);
+      status.className = 'modal-status error';
+      status.textContent = 'Something went wrong. Please try again or contact us directly.';
+      btn.disabled = false;
+      btnTxt.textContent = 'Send My Results →';
+    }
+  }
+
+  // ── BOOT ──
+  initProgress();
+  document.getElementById('next-4').disabled = false; // slider step always valid
+</script>
+</body>
+</html>
